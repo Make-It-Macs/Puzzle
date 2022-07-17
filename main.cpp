@@ -1,20 +1,28 @@
+#include <Arduino.h>
 // CONSTANTS
 // The "start zone" which players must touch to start the game each time
-const byte startPin = 8;
+const byte startPin = 3;
 // Touching any part of the wire itself causes a failure
-const byte failPin = 9;
+const byte failPin = 5;
 // The "win zone" at the end of the wire
-const byte endPin = 10;
-const byte relayPin = 5;
+const byte endPin = 4;
+const byte relayPin = 2;
 // A piezo buzzer chirps to signify success/failure
-const byte buzzerPin = 6;
-const byte grnPin = 4;
-const byte redPin = 3;
+const byte buzzerPin = 13;
+const byte grnPin = 6;
+const byte redPin = 7;
 
 // GLOBALS
 // Keep track of the current states of the game
 enum GameState {FAILED, IN_PROGRESS, SUCCESS};
 GameState gameState = GameState::FAILED;
+
+
+void initGame(){
+    digitalWrite(grnPin, LOW);
+    digitalWrite(redPin, LOW);
+    digitalWrite(relayPin, LOW);
+}
 
 void setup() {
   // Set the pins to the correct mode
@@ -63,9 +71,12 @@ void loop() {
       break;
 
     case GameState::FAILED:
+      //Do nothing
+      //Run Success Case to Check for Game Start
     case GameState::SUCCESS:
-     
-      if(!digitalRead(startPin)) {
+      int sensorValue = digitalRead(startPin);
+      Serial.println("StartPin:" +  String(sensorValue));
+      if(!digitalRead(startPin) & digitalRead(failPin)) {
         gameState = GameState::IN_PROGRESS;
         Serial.println("New Game Started");
         initGame();
@@ -79,10 +90,7 @@ void loop() {
       }
       break;    
   }
+  delay(5);
 }
 
-void initGame(){
-    digitalWrite(grnPin, LOW);
-    digitalWrite(redPin, LOW);
-    digitalWrite(relayPin, LOW);
-}
+
